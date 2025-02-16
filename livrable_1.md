@@ -72,9 +72,12 @@ Ces lacunes montrent clairement l’intérêt d’explorer des approches alterna
      Nous mettrons en lumière notre compréhension du fonctionnement de la blockchain, incluant des concepts tels que la décentralisation, l’immutabilité, le consensus distribué, et la preuve de travail.
 
    - *Développement d’une maquette :*  
-     Nous concevrons une maquette d’une blockchain en Python. Cette maquette permettra de simuler un enregistrement sécurisé de transactions financières, montrant comment chaque transaction est horodatée et inscrite de manière immuable dans un bloc. Ce prototype servira à illustrer concrètement comment la blockchain peut adresser les défis du système bancaire en renforçant la transparence, la sécurité, et l’efficacité des paiements.
+     Nous concevrons une maquette d’une blockchain en Python. Cette maquette permettra de simuler un enregistrement sécurisé de transactions financières, montrant comment chaque transaction est horodatée et inscrite de manière immuable dans un bloc. Ce prototype servira à illustrer concrètement comment la blockchain peut résoudre certaines lacunes du système bancaire en renforçant la transparence, la sécurité, les coûts, et l’efficacité des paiements.
 
 ---
+
+M.A.
+
 
 ### Synthèse pour la présentation PPT (5 slides en 5 minutes)
 
