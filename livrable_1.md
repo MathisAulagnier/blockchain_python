@@ -30,6 +30,7 @@ Ce livrable vise à poser les fondations du projet en:
 
 Nous avons ainsi recherché des problématiques existantes suscitant notre intérêt, ce qui nous a naturellement conduits à explorer la blockchain. En nous interrogeant sur les défis que cette technologie peut résoudre, nous nous sommes penchés sur les dysfonctionnements du système bancaire.
 
+---
 
 ### 1. Quel est le problème dans le système bancaire actuel ?
 
