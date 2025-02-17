@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="images/uqac_transparent.png" alt="Logo de l'école">
-</p>
-
 # Livrable 1 - Projet - Conception et architecture des systèmes infonuagique
 
 8INF876 - Conception/architecture des systèmes infonuagique
