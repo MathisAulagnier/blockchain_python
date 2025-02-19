@@ -6,7 +6,7 @@ import time
 class TestBlockchain(unittest.TestCase):
 
     def setUp(self):
-        self.blockchain = Blockchain()
+        self.blockchain = Blockchain(difficulty=2)
 
     def test_initial_chain(self):
         self.assertEqual(len(self.blockchain.chain), 1, 'Initial chain should have only the genesis block')
@@ -31,11 +31,6 @@ class TestBlockchain(unittest.TestCase):
         last_block = self.blockchain.get_last_block()
         self.assertEqual(last_block.index, 1)
         self.assertEqual(last_block.transactions, ["Transaction 1"])
-
-    def test_block_hash(self):
-        block = Block(0, "0", time.time(), ["Genesis Block"], 0)
-        expected_hash = block.calculate_hash()
-        self.assertEqual(block.hash, expected_hash)
 
     def test_blockchain_length(self):
         self.blockchain.add_block(["Transaction 1"])

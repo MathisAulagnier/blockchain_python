@@ -1,3 +1,5 @@
+.PHONY: test commit
+
 test:
 	python -m unittest discover test
 
@@ -7,3 +9,7 @@ commit: test
 	@git commit -m "Modifications: $$(cat modified_files.txt)"
 	@git push
 	@rm modified_files.txt
+
+clean:
+	rm -rf src/__pycache__/
+	rm -rf test/__pycache__/

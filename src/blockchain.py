@@ -5,10 +5,9 @@ import hashlib
 
 
 class Blockchain:
-    def __init__(self):
+    def __init__(self, difficulty=2):
+        self.difficulty = difficulty
         self.chain = [self.create_genesis_block()]
-        self.nb_transactions = 0
-        self.nb_blocks = 1
 
     def create_genesis_block(self):
         """
@@ -17,11 +16,9 @@ class Blockchain:
         return Block(
             index=0,
             previous_hash="0",
-            timestamp=time.time(),
             transactions=["Genesis Block"],
-            nonce=0
+            difficulty=self.difficulty
         )
-    
     
     def get_last_block(self):
         """
@@ -37,9 +34,8 @@ class Blockchain:
         new_block = Block(
             index=last_block.index + 1,
             previous_hash=last_block.hash,
-            timestamp=time.time(),
             transactions=transactions,
-            nonce=0
+            difficulty=self.difficulty
         )
         self.chain.append(new_block)
 
@@ -64,3 +60,6 @@ class Blockchain:
                 return False
 
         return True
+    
+
+
