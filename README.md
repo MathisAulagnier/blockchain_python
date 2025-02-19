@@ -41,3 +41,23 @@ Pour exécuter le script [main.py](src/main.py), utilisez la commande suivante d
 python -m src.main
 ```
 
+## Contributeurs
+Pour ajouter, commit et push vos modifications, utilisez les commandes suivantes :
+
+1. Assurez-vous que tous les tests passent avant de committer vos modifications :
+
+    ```sh
+    make test
+    ```
+
+2. Si tous les tests passent, vous pouvez ajouter, commit et push vos modifications en une seule commande :
+
+    ```sh
+    make commit
+    ```
+
+La commande `make commit` va :
+- Exécuter les tests pour s'assurer qu'ils passent.
+- Ajouter tous les fichiers modifiés.
+- Créer un commit avec un message listant les fichiers modifiés.
+- Pousser les changements vers le dépôt distant.
