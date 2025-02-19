@@ -1,5 +1,6 @@
-import unittest
 from src.blockchain import Blockchain, Block
+
+import unittest
 import time
 
 class TestBlockchain(unittest.TestCase):

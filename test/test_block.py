@@ -1,7 +1,6 @@
 from src.block import Block
 import hashlib
 import time
-
 import unittest
 
 class TestBlock(unittest.TestCase):
