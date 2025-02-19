@@ -1,10 +1,5 @@
 # blockchain_python
 
-
-## Prérequis
-
-- Python 3.11 ou une version ultérieure
-
 ## Installation
 
 1. Clonez le dépôt :
@@ -38,3 +33,11 @@ Pour l'ensemble des tests, utilisez la commande suivante :
 ```sh
 python -m unittest discover test
 ```
+
+## Exécution
+
+Pour exécuter le script [main.py](src/main.py), utilisez la commande suivante depuis la racine du projet :
+```sh
+python -m src.main
+```
+
