@@ -1,0 +1,6 @@
+# Mathis' files
+script.md
+
+# Python's files
+*.pyc
+*/__pycache__/
