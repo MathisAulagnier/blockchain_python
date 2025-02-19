@@ -1,4 +1,0 @@
-.gitignore
-modified_files.txt
-src/blockchain.py
-src/main.py
