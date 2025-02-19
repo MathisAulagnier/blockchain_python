@@ -1,6 +1,9 @@
 # Mathis' files
 script.md
 
+# Make's files
+modified_files.txt
+
 # Python's files
 *.pyc
 */__pycache__/

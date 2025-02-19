@@ -1,4 +1,3 @@
-# Importation des classes
 from src.blockchain import Blockchain
 from src.block import Block
 

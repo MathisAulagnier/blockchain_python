@@ -1,8 +1,7 @@
 from src.block import Block
-import time
 
-import hashlib
 import time
+import hashlib
 
 
 class Blockchain:
