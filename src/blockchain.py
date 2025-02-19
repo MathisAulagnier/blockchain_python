@@ -18,7 +18,7 @@ class Blockchain:
             index=0,
             previous_hash="0",
             timestamp=time.time(),
-            data=["Genesis Block"],
+            transactions=["Genesis Block"],
             nonce=0
         )
     
@@ -29,7 +29,7 @@ class Blockchain:
         """
         return self.chain[-1]
 
-    def add_block(self, data):
+    def add_block(self, transactions):
         """
         Ajoute un nouveau bloc avec une liste de transactions.
         """
@@ -38,7 +38,7 @@ class Blockchain:
             index=last_block.index + 1,
             previous_hash=last_block.hash,
             timestamp=time.time(),
-            data=data,
+            transactions=transactions,
             nonce=0
         )
         self.chain.append(new_block)
