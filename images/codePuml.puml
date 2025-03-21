@@ -1,0 +1,48 @@
+@startuml
+package "Langage Move" {
+  [Sandboxing] as Sandbox
+  [Ressources non copiables] as Resources
+  [Vérification formelle] as Verification
+  [Permissions UNIX-like] as Permissions
+}
+
+Sandbox --> Resources: Isolation des actifs
+Resources --> Verification: Prévention de réentrance
+Permissions --> Sandbox: Accès contrôlé par clés
+@enduml
+
+
+@startuml
+actor Utilisateur
+component Validateurs
+database "Registre Blockchain" as Blockchain
+
+LibraBFT -> Validateurs: Validation par votes
+Utilisateur -> Validateurs: Transaction
+Validateurs -> LibraBFT: Proposition de bloc
+Validateurs -> Move: Exécution sécurisée
+Move --> Blockchain: Mise à jour de l'état
+Blockchain --> Utilisateur: Confirmation
+@enduml
+
+
+@startuml
+actor Utilisateur as User
+participant "Validateurs" as Validators
+participant "LibraBFT" as Consensus
+participant "Sandbox Move" as Move
+
+User -> Validators : Transaction signée
+Consensus -> Validators : Élection d'un leader
+Validators -> Consensus : Proposition de bloc
+Consensus -> Validators : Votants valident le bloc
+
+loop Vérification BFT
+  Validators -> Validators : Tolérance aux pannes byzantines (⅔ honnêtes)
+end
+
+Validators -> Move : Exécution déterministe
+Move --> Validators : Résultat approuvé
+Validators -> Consensus : Bloc finalisé
+Consensus --> User : Confirmation de la transaction
+@enduml
