@@ -1,0 +1,68 @@
+section(Présentation générale de la Blockchain)
+
+La blockchain est un registre numérique, distribué et décentralisé. Un registre numérique est une base de données qui enregistre des informations. Quant au terme “Distribué”, il signifie que ces données sont partagées entre plusieurs ordinateurs au lieu d’être stockées sur un serveur unique. Décentralisé, signifie qu’aucune autorité centrale ne contrôle ces informations. L’idée de la blockchain n’est pas récente, nous allons brièvement voir l’histoire de celle-ci. 
+
+subsection(Genèse et Évolution de la Blockchain)
+
+En 1982, le cryptographe David Chaum propose un protocole similaire à la blockchain dans sa thèse « Computer Systems Established, Maintained, and Trusted by Mutually Suspicious Groups ». Ce travail pose les bases de la sécurité des systèmes distribués et de la confiance numérique.
+En 1991, Stuart Haber et W. Scott Stornetta publient « How to Time-Stamp a Digital Document ». Ils introduisent des timestamps sécurisés et décrivent un système cryptographiquement fiable. Ce système lie des blocs d’informations pour vérifier leur intégrité et empêcher toute modification. Ceci jette ainsi les bases des registres décentralisés et sécurisés.
+En 1998, les concepts se rapprochent des blockchains actuelles. Wei Dai propose le concept de b-money, une monnaie électronique décentralisée. Il utilise des clés publiques et privées pour identifier les utilisateurs et signer les transactions. Les unités sont générées par un mécanisme hybride de preuve de travail et un panier de marchandises. Parallèlement, Nick Szabo présente le Bit Gold. Ce concept repose sur la création d'une rareté numérique grâce à la preuve de travail. Les unités sont obtenues grâce à la puissance de calcul et ajoutées à un registre public.
+Bien que ces concepts ne soient pas concrétisés, ils influencent le développement de Bitcoin. En 2008, Bitcoin apparaît sous le pseudonyme Satoshi Nakamoto. Un livre blanc présente la technologie blockchain et décrit Bitcoin comme une monnaie numérique peer-to-peer. Ce document établit le modèle de la blockchain en expliquant comment enregistrer les transactions dans un registre public sans autorité centrale.
+En 2014, la blockchain se sépare de la (crypto)monnaie. Elle permet le développement d’autres applications financières. Des projets comme Ethereum introduisent les « smart contracts » qui exécutent automatiquement un contrat dès que certaines conditions sont remplies.
+
+%% figure représentent la chronologie de l’évolution de la blockchain.
+
+subsection(Architecture et Fonctionnement de la Blockchain)
+
+subsubsection(Les Blocs et la Chaîne : Les Fondamentaux)
+L’architecture de la blockchain repose sur plusieurs principes fondamentaux. L'architecture de la blockchain repose sur la décomposition du terme en deux éléments clés : block (bloc) et chain (chaîne), représentant respectivement les blocs d'information et leur enchaînement au sein du système. Un bloc, dans ce contexte, est une unité de données qui contient plusieurs éléments fondamentaux. Il regroupe, entre autres, un ensemble d'informations validées, comme des transferts de valeur. Chaque bloc est doté d’un identifiant unique, appelé le hash, généré à l’aide d’algorithmes cryptographiques. Ce hash joue un rôle crucial puisqu’il garantit l’intégrité des données contenues dans le bloc. En outre, pour créer une liaison logique avec le reste de la chaîne, chaque bloc inclut également une référence au hash du bloc précédent. 
+
+
+%% figure représentant un bloc de la blockchain
+
+Ces blocs ne fonctionnent pas indépendamment ; ils sont reliés entre eux pour former ce que l’on appelle la chaîne ou "chain". Ce lien est établi grâce aux références des hash, ce qui aboutit à une structure continue, ordonnée de façon chronologique. Par exemple, un bloc 90 fera référence au bloc 89, un bloc 91 au bloc 90, et ainsi de suite. Toute tentative de modification des données dans un bloc entraînerait un changement dans son hash, rendant automatiquement tous les blocs suivants invalides. Cette chaîne immuable est conçue pour garantir la sécurité et la transparence des enregistrements réalisés sur la blockchain.
+
+subsubsection(La Décentralisation et les Types de Blockchains)
+Un aspect central de cette technologie réside dans son fonctionnement décentralisé, bien que le degré de décentralisation et de transparence puisse varier selon le type de blockchain utilisé. Il existe principalement quatre types de blockchains : publiques, privées, hybrides et par consortium.
+Les blockchains publiques, comme Bitcoin ou Ethereum, sont totalement ouvertes. N’importe qui peut y participer, valider des transactions et consulter l’ensemble du registre. Cette transparence garantit une traçabilité totale des échanges et limite les risques d’opacité ou de manipulation.
+Les blockchains privées, en revanche, sont contrôlées par une seule organisation qui décide des participants et des règles d’accès. À la différence des blockchains publiques, leur accès est restreint et elles ne garantissent pas nécessairement une transparence totale. Toutefois, elles offrent une meilleure confidentialité et un contrôle accru, ce qui les rend adaptées aux entreprises gérant des données sensibles.
+Les blockchains hybrides combinent des éléments des blockchains publiques et privées. Par exemple, une entreprise peut utiliser une blockchain privée pour traiter des transactions internes tout en enregistrant certains éléments sur une blockchain publique pour assurer une transparence partielle et vérifiable.
+Enfin, les blockchains par consortium sont gérées par un groupe d’entités plutôt qu’un seul acteur. Elles offrent un compromis entre transparence et contrôle, garantissant que seuls des acteurs de confiance peuvent valider les transactions, tout en limitant les risques de centralisation excessive.
+Ainsi, selon leur nature, les blockchains ne garantissent pas tout le même niveau de transparence et de décentralisation. Cependant, elles conservent l’avantage de sécuriser les transactions, de limiter le besoin d’intermédiaires et d’améliorer la traçabilité des échanges. Pour les blockchains publiques, il est possible d’observer directement les transactions via des explorateurs comme blockchain.com.
+
+
+subsection(Exploration d'une Blockchain : L'Exemple de Bitcoin)
+
+Pour illustrer le fonctionnement d’une blockchain, prenons l’exemple de Bitcoin. La blockchain Bitcoin est publique et accessible à tous. Grâce à des explorateurs de blockchain, il est possible de visualiser l’ensemble des transactions effectuées sur le réseau Bitcoin. 
+Ici, l'explorateur blockchain.com, l'un des plus populaires, est utilisé. L'image illustre l'ensemble des blocs minés jusqu'à présent, ainsi que diverses métriques financières relatives au Bitcoin. Sur la photo, nous pouvons observer l'ensemble des blocs qui ont été minés jusqu'à aujourd'hui, ainsi que diverses métriques financières liées à l'actif Bitcoin.
+
+% figure représentant l'explorateur de la blockchain son cours et ses blocs.
+
+Ensuite, il est possible d’inspecter l’état d’un bloc en particulier afin d'en examiner le contenu. 
+
+%% figure représentant le contenu d'un bloc de la blockchain
+
+Pour ce bloc, nous avons accès à de nombreuses informations détaillées, y compris son contenu. À droite de l’image, apparaissent les transactions entre utilisateurs, anonymisées grâce à un identifiant unique sous forme de code. Il est également possible de vérifier le contenu de ces transactions ainsi que les méthodes de validation utilisées pour leur approbation.
+
+%% figure représentant le contenu d'une transaction de la blockchain
+
+Les informations disponibles incluent : le montant des transactions, les frais associés (destinés à rémunérer les mineurs), le registre dans lequel ces transactions sont inscrites, le bloc d'appartenance, la taille du bloc, la date de validation, ainsi que les adresses (anonymes) des wallets d'origine et de destination
+
+subsection(Au-Delà des Cryptomonnaies : Diverses Applications de la Blockchain)
+
+
+
+Bien que nous ayons pris l’exemple de Bitcoin, la blockchain possède de nombreuses autres applications. Loin de se limiter aux transactions financières, elle s’impose comme une technologie polyvalente.
+Par exemple, dans le domaine du luxe et de la traçabilité des actifs, Everledger utilise la blockchain pour assurer l’authenticité et la provenance des diamants. Chaque diamant validé se voit attribuer un jumeau numérique, une identité unique qui renferme ses caractéristiques, son origine et son parcours. Ces données, stockées de manière sécurisée, permettent aux propriétaires de vérifier l'authenticité de leur bien et d'effectuer des transferts en toute confiance. Grâce à la blockchain, ces transferts sont horodatés et immuables, assurant une traçabilité totale et réduisant les risques de fraude.
+Au-delà du luxe, la blockchain trouve des applications dans de nombreux secteurs. Dans le médical, elle permet le stockage sécurisé des dossiers patients tout en garantissant leur intégrité et un accès restreint aux professionnels de santé. Pour l’identité numérique, elle propose une alternative fiable aux systèmes traditionnels, offrant aux utilisateurs un moyen de prouver leur identité sans dépendre d’une autorité centrale.
+Les entreprises l’exploitent aussi pour authentifier des produits et lutter contre la contrefaçon, grâce à la transparence et l’immuabilité des registres. Elle est également utilisée pour la gestion des droits numériques, permettant aux créateurs de garantir la propriété de leurs œuvres et d’en contrôler la distribution.
+D’autres usages émergent, comme le vote électronique, qui renforce la transparence des élections, ou encore les échanges de biens numériques via les NFT, qui certifient l’unicité et la provenance d’un actif. Enfin, la blockchain révolutionne des domaines comme l’Internet des objets (IoT), le jeu vidéo et l’e-commerce, grâce aux smart contracts, qui permettent d’exécuter automatiquement des transactions sécurisées sans intermédiaires.
+Ces innovations montrent que la blockchain ne se limite pas aux cryptomonnaies, mais ouvre la voie à une nouvelle ère numérique fondée sur la confiance, la transparence et la décentralisation.
+
+
+subsection(Mécanismes de Consensus : Garantir la Stabilité et la Sécurité)
+Dans le cadre d’une blockchain, un mécanisme de consensus permet de garantir la stabilité du système, malgré l’indisponibilité ou le mauvais fonctionnement d’un ou plusieurs de ses nœuds, et de conduire à ce que les nœuds arrivent au même état. Ces mécanismes cryptographiques avancés qui rendent les attaques bien plus complexes que sur un système centralisé sont nombreux. Le Proof of Work (PoW), utilisé par Bitcoin, repose sur la résolution de calculs complexes par des mineurs pour valider les transactions, garantissant une sécurité robuste, mais au prix d’une forte consommation énergétique. En alternative, le Proof of Stake (PoS) sélectionne les validateurs en fonction du nombre de jetons qu’ils détiennent et verrouillent, réduisant ainsi les coûts énergétiques et accélérant les validations. Le Delegated Proof of Stake (DPoS) affine ce modèle en permettant aux détenteurs de jetons d’élire un nombre restreint de validateurs, optimisant la rapidité mais introduisant une certaine centralisation. D’autres approches existent, comme le Proof of Authority (PoA), qui repose sur un ensemble limité de validateurs fiables et est souvent utilisé dans des blockchains privées, ou encore le Proof of Burn (PoB), où les validateurs détruisent une partie de leurs actifs pour prouver leur engagement. Le Proof of Space, quant à lui, utilise l’espace de stockage comme ressource de validation, offrant une alternative plus écologique au PoW. Enfin, certains systèmes hybrides combinent plusieurs de ces méthodes, comme les blockchains exploitant des algorithmes Byzantine Fault Tolerance (BFT) en complément du PoS pour améliorer la scalabilité et la finalité des transactions.
+
+subsection(Avantages et Inconvénients de la Blockchain)
+Pour conclure cette section, il est essentiel de souligner que la technologie blockchain offre de nombreux avantages. Parmi eux, une transparence accrue, car toutes les transactions peuvent être consultées par n’importe quel utilisateur, ainsi qu’une immuabilité des données : une fois enregistrées, elles ne peuvent être modifiées sans l’accord du réseau. Ces caractéristiques représentent une véritable avancée en termes de sécurité et de confiance dans les systèmes décentralisés.
+Cependant, la blockchain présente également certains inconvénients. Tout d'abord, certaines blockchains, comme celle de Bitcoin, reposent sur des méthodes de consensus énergivores telles que le Proof of Work (PoW), une technologie qui, bien que robuste, est aujourd'hui considérée comme vieillissante en raison de son impact environnemental. De plus, la complexité inhérente à cette technologie peut constituer un frein à sa compréhension et à son adoption, en particulier pour les utilisateurs non-initiés. Enfin, il convient de souligner que l'anonymat des utilisateurs sur certaines blockchains, bien qu'il garantisse leur confidentialité, peut également permettre l'existence de transactions associées à des activités illicites ou controversées, ce qui peut poser des problématiques éthiques et légales.
