@@ -97,7 +97,7 @@ def plot_value(period, show_derivate_product=False):
     # Calculer la valeur
     data_value = (data_euro['Close'] + data_yen['Close'] + 1) / 3
     data_value = data_value.rename("Value")
-    print(data_value)
+    # print(data_value)
 
     # Implémentation de la fonction d'affichage
     plt.figure(figsize=(10, 5))
@@ -118,4 +118,4 @@ def plot_value(period, show_derivate_product=False):
 
 
 # print(get_value())
-plot_value(30, True)
+# plot_value(30, True)
