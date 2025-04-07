@@ -58,7 +58,7 @@ def get_current_date():
     return datetime.now().strftime('%Y-%m-%d')
 
 
-def plot_value(period, show_derivate_product=False):
+def plot_value_index(period, show_derivate_product=False):
     """
     Affiche la valeur du token ((euro$ + yen$ + usd$) / 3) sur une période donnée.
 

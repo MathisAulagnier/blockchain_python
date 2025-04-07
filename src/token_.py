@@ -36,7 +36,7 @@ class Token:
         """Récupère la valeur actuelle du token"""
         return get_value()
     
-    def plot_value(graph, nb_days=30):
+    def plot_value(nb_days=30):
         """Affiche la valeur du token sur un graphique"""
         # Implémentation de la fonction d'affichage
         plot_value_index(nb_days)
