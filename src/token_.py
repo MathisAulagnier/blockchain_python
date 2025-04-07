@@ -12,7 +12,7 @@ import uuid
 import json
 import hashlib
 from datetime import datetime
-from src.indexation import get_value
+from src.indexation import get_value, plot_value_index
 
 
 
@@ -32,6 +32,16 @@ class Token:
         }, sort_keys=True).encode()
         return hashlib.sha256(token_string).hexdigest()
     
+    def get_value(self):
+        """Récupère la valeur actuelle du token"""
+        return get_value()
+    
+    def plot_value(graph, nb_days=30):
+        """Affiche la valeur du token sur un graphique"""
+        # Implémentation de la fonction d'affichage
+        plot_value_index(nb_days)
+        # Demander si vous souhaiter récupérer les dataframes des devises
+        return None
         
     def toggle_staking(self):
         """Active ou désactive le staking pour ce token"""
