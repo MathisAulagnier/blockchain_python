@@ -1,7 +1,21 @@
+###################
+#### ATTENTION ####
+##### NE  PAS #####
+#### SUPPRIMER ####
+## CE FICHIER !  ##
+###################
+
+# Vous pouvez le renommer blockchain_pow.py
+# Pour ensuite ecrire votre propre blockchain en PoA
+
+
 from src.block import Block
 
 import time
 import hashlib
+
+
+
 
 
 class Blockchain:
