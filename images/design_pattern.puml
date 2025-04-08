@@ -1,0 +1,68 @@
+classDiagram
+    class Block {
+        +int index
+        +string previous_hash
+        +float timestamp
+        +list transactions
+        +int nonce
+        +int difficulty
+        +string hash
+        +__init__(index, previous_hash, transactions, difficulty, timestamp)
+        +calculate_hash() string
+        +mine_block() string
+        +print_block() void
+        +__repr__() string
+    }
+    
+    class Blockchain {
+        +int difficulty
+        +list chain
+        +__init__(difficulty)
+        +create_genesis_block() Block
+        +get_last_block() Block
+        +add_block(transactions) void
+        +is_chain_valid() boolean
+    }
+    
+    class Token {
+        +string identifier
+        +boolean staking
+        +float created_at
+        +string hash
+        +__init__()
+        +calculate_hash() string
+        +get_value() float
+        +plot_value(nb_days) void
+        +toggle_staking() void
+        +to_dict() dict
+        +__repr__() string
+    }
+    
+    class TokenManager {
+        +dict tokens
+        +int max_tokens
+        +__init__(max_tokens)
+        +create_token() Token
+        +create_initial_tokens(count) list
+        +get_token(token_id) Token
+        +get_all_tokens() list
+        +get_staking_tokens() list
+        +get_tokens_value() float
+        +get_staking_tokens_value() float
+    }
+    
+    class TokenBlockchain {
+        +TokenManager token_manager
+        +__init__(difficulty)
+        +create_initial_supply(count) list
+        +transfer_token(token_id, from_address, to_address) dict
+        +stake_token(token_id, address) dict
+        +get_token_history(token_id) list
+        +get_token_by_index(index) Token
+        +get_staking_stats() dict
+    }
+    
+    Blockchain <|-- TokenBlockchain : extends
+    TokenBlockchain o-- TokenManager : contains
+    TokenManager o-- Token : manages
+    Blockchain o-- Block : contains
