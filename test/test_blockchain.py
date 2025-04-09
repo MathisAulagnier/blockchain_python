@@ -1,44 +1,69 @@
-from src.blockchain import Blockchain, Block
+#!/usr/bin/env python3
+"""
+Fichier : test_blockchain.py
+Ce test unitaire vérifie le bon fonctionnement de la classe Blockchain.
+Les tests portent sur :
+- La création du bloc génésis
+- L'ajout de transactions et l'enregistrement de validateurs
+- L'ajout d'un bloc (avec intégration des données PoS et PBFT)
+- La validité de l'intégrité de la chaîne (is_chain_valid)
+"""
 
-import unittest
 import time
+import unittest
+from src.block import Block
+from src.blockchain import Blockchain
 
 class TestBlockchain(unittest.TestCase):
-
     def setUp(self):
-        self.blockchain = Blockchain(difficulty=2)
+        self.blockchain = Blockchain()
 
-    def test_initial_chain(self):
-        self.assertEqual(len(self.blockchain.chain), 1, 'Initial chain should have only the genesis block')
-        self.assertEqual(self.blockchain.chain[0].index, 0)
-        self.assertEqual(self.blockchain.chain[0].transactions, ["Genesis Block"])
+    def test_genesis_block(self):
+        genesis = self.blockchain.chain[0]
+        self.assertEqual(genesis.index, 0)
+        self.assertEqual(genesis.previous_hash, "0")
+        self.assertEqual(genesis.transactions, ["Genesis Block"])
 
-    def test_add_block(self):
-        self.blockchain.add_block(["Transaction 1"])
+    def test_add_transaction_and_block(self):
+        # Ajout d'une transaction
+        tx = "Alice envoie 1 token à Bob"
+        self.blockchain.add_transaction(tx)
+        self.assertEqual(len(self.blockchain.pending_transactions), 1)
+        
+        # Enregistrement d'un validateur
+        self.blockchain.register_validator("Validator1", 100)
+        self.assertIn("Validator1", self.blockchain.validators)
+        self.assertEqual(self.blockchain.stakes["Validator1"], 100)
+
+        # Choix du validateur (ici, seul enregistré)
+        chosen_validator = self.blockchain.choose_validator()
+        self.assertEqual(chosen_validator, "Validator1")
+
+        # Ajout d'un bloc avec une signature PBFT fictive
+        dummy_signature = "dummy_signature"
+        self.blockchain.add_block(chosen_validator, dummy_signature)
+        
+        # Après ajout, les transactions en attente doivent être vidées et la chaîne comporter 2 blocs
+        self.assertEqual(len(self.blockchain.pending_transactions), 0)
         self.assertEqual(len(self.blockchain.chain), 2)
-        self.assertEqual(self.blockchain.chain[1].index, 1)
-        self.assertEqual(self.blockchain.chain[1].transactions, ["Transaction 1"])
+        
+        new_block = self.blockchain.chain[1]
+        self.assertEqual(new_block.validator, "Validator1")
+        self.assertEqual(new_block.pbft_signature, dummy_signature)
+        # Vérifie que le bloc référence bien le hash du bloc précédent
+        self.assertEqual(new_block.previous_hash, self.blockchain.chain[0].hash)
 
     def test_is_chain_valid(self):
-        self.blockchain.add_block(["Transaction 1"])
+        # Ajoute une transaction et un bloc correct
+        self.blockchain.add_transaction("Test Transaction")
+        self.blockchain.register_validator("Validator1", 50)
+        chosen_validator = self.blockchain.choose_validator()
+        self.blockchain.add_block(chosen_validator, "sig")
         self.assertTrue(self.blockchain.is_chain_valid())
-        # Tamper with the blockchain
+
+        # Altération d'un bloc pour simuler une corruption
         self.blockchain.chain[1].transactions = ["Tampered Transaction"]
         self.assertFalse(self.blockchain.is_chain_valid())
 
-    def test_get_last_block(self):
-        self.blockchain.add_block(["Transaction 1"])
-        last_block = self.blockchain.get_last_block()
-        self.assertEqual(last_block.index, 1)
-        self.assertEqual(last_block.transactions, ["Transaction 1"])
-
-    def test_blockchain_length(self):
-        self.blockchain.add_block(["Transaction 1"])
-        self.blockchain.add_block(["Transaction 2"])
-        self.assertEqual(len(self.blockchain.chain), 3)
-
-
 if __name__ == '__main__':
     unittest.main()
-
-       

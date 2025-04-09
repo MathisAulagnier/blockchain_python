@@ -1,5 +1,5 @@
-from src.blockchain import Blockchain
-from src.block import Block
+from src.blockchain import BlockchainPow
+from src.block import BlockPow
 
 # Création de la blockchain
 my_blockchain = Blockchain(difficulty=4)
