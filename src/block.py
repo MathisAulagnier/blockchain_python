@@ -3,50 +3,55 @@ import json
 import time
 
 class Block:
-    def __init__(self, index, previous_hash, transactions, difficulty=2, timestamp=None):
+    def __init__(self, index, previous_hash, transactions, timestamp=None):
+        """
+        Initialise un bloc de la blockchain en configurant ses données et en calculant son hash.
+        Les attributs validator et pbft_signature sont initialisés à None.
+        :param index: l'indice du bloc dans la chaîne
+        :param previous_hash: le hash du bloc précédent
+        :param transactions: la liste des transactions à inclure dans le bloc
+        :param timestamp: l'horodatage du bloc, ou le temps actuel si None
+        """
         self.index = index
         self.previous_hash = previous_hash
         self.timestamp = timestamp or time.time()
         self.transactions = transactions
-        self.nonce = 0
-        self.difficulty = difficulty 
-        self.hash = self.mine_block()  # On mine le bloc dès sa création
-
+        # Initialisation des attributs pour Proof of Stake (PoS) et consensus PBFT
+        self.validator = None
+        self.pbft_signature = None
+        # Calcule immédiatement le hash sans processus de minage
+        self.hash = self.calculate_hash()
 
     def calculate_hash(self):
         """
-        Génère le hash du bloc à partir de son contenu.
+        Calcule le hash du bloc en utilisant SHA-256 sur un dictionnaire des données du bloc.
+        Les attributs validator et pbft_signature sont inclus pour garantir l'intégrité dans le contexte PoS/PBFT.
+        :return: Le hash du bloc sous forme de chaîne hexadécimale.
         """
-        block_string = json.dumps({
+        block_data = {
             "index": self.index,
             "timestamp": self.timestamp,
             "transactions": self.transactions,
             "previous_hash": self.previous_hash,
-            "nonce": self.nonce
-        }, sort_keys=True).encode()
+            "validator": self.validator,
+            "pbft_signature": self.pbft_signature
+        }
+        block_string = json.dumps(block_data, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
-    
-    def mine_block(self):
-        """
-        Trouve un hash valide respectant la difficulté (Proof of Work).
-        """
-        while True:
-            hash_attempt = self.calculate_hash()
-            if hash_attempt[:self.difficulty] == "0" * self.difficulty:
-                print(f"Bloc {self.index} miné : {hash_attempt}")
-                return hash_attempt
-            self.nonce += 1
-    
+
     def print_block(self):
-        print('__Block n°', self.index,"__")
-        print('Hash precedent : ', self.previous_hash[:10])
-        print('Date : ', self.timestamp)
-        print("Nombre de transactions : ", len(self.transactions))
-        print(self.transactions)
-        print('Hash block:', self.hash[:10])
-        print('Nonce : ', self.nonce)
+        """
+        Affiche les informations essentielles du bloc pour le débogage ou la visualisation.
+        """
+        print(f'__Block n° {self.index} __')
+        print(f'Hash précédent : {self.previous_hash[:10]}')
+        print(f'Date : {self.timestamp}')
+        print(f'Nombre de transactions : {len(self.transactions)}')
+        print(f'Transactions : {self.transactions}')
+        print(f'Hash du bloc: {self.hash[:10]}')
+        print(f'Validateur : {self.validator}')
+        print(f'Signature PBFT : {self.pbft_signature}')
         print('_______________\n')
 
-
     def __repr__(self):
-        return f"Block({self.index}, {self.previous_hash}, {self.timestamp}, {self.transactions}, {self.nonce}, {self.hash})"
+        return f"Block({self.index}, {self.previous_hash}, {self.timestamp}, {self.transactions}, {self.hash})"
