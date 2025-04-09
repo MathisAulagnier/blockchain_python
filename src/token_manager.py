@@ -30,8 +30,9 @@ class TokenManager:
     def get_all_tokens(self):
         return list(self.tokens.values())
     
-    def get_staking_tokens(self):
-        return [token for token in self.tokens.values() if token.staking]
+    # N'existe pas car les la gestion des tokens en staking est gérée par le wallet
+    # def get_staking_tokens(self): 
+       # return [token for token in self.tokens.values() if token.staking]
     
     def get_tokens_value(self):
         """Calcule la valeur totale de tous les tokens"""
@@ -43,12 +44,13 @@ class TokenManager:
         single_value = next(iter(self.tokens.values())).get_value()
         return single_value * len(self.tokens)
     
-    def get_staking_tokens_value(self):
-        """Calcule la valeur totale des tokens en staking"""
-        staking_tokens = self.get_staking_tokens()
-        if not staking_tokens:
-            return 0
+    # A supprimer car la gestion des tokens en staking est gérée par le wallet
+    # def get_staking_tokens_value(self):
+        # """Calcule la valeur totale des tokens en staking"""
+        # staking_tokens = self.get_staking_tokens()
+        # if not staking_tokens:
+        #     return 0
             
-        single_value = staking_tokens[0].get_value()
-        return single_value * len(staking_tokens)
-    
+        # single_value = staking_tokens[0].get_value()
+        # return single_value * len(staking_tokens)
+  

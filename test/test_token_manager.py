@@ -34,24 +34,5 @@ class TestTokenManager(unittest.TestCase):
         
         # Test avec un ID inexistant
         self.assertIsNone(self.token_manager.get_token("nonexistent_id"))
-        
-    def test_get_staking_tokens(self):
-        # Créer quelques tokens
-        tokens = self.token_manager.create_initial_tokens(count=10)
-        
-        # Aucun token en staking au début
-        self.assertEqual(len(self.token_manager.get_staking_tokens()), 0)
-        
-        # Mettre quelques tokens en staking
-        tokens[0].staking = True
-        tokens[3].staking = True
-        tokens[7].staking = True
-        
-        staking_tokens = self.token_manager.get_staking_tokens()
-        self.assertEqual(len(staking_tokens), 3)
-        self.assertIn(tokens[0], staking_tokens, "Token 0 should be in staking tokens")
-        self.assertIn(tokens[3], staking_tokens)
-        self.assertIn(tokens[7], staking_tokens)
-    
 
 

@@ -1,0 +1,5 @@
+- Ajouter les fonctions de staking avec des contrats a durée limitée. avec un StakeCOnteact
+- Faire plusieurs transaction en meme temps (je crois qu'on créer un bloc par transaction en ce moment)
+- Vérifier si les wallet se modifient bien dans le temps etr sur toutes les instances, car actuellement on ecrit seulement les transactions des jetons entre les wallet mais on ne renseigne pas les status des wallets
+- Faire des fonctions pour selectionner plus facilement les tokens dans les wallet, récupérer les x premiers tokens, les x derniers tokens, pouvoir manipuler plusieurs token en meme temps.
+- Actuellement on ne peut envoyer qu'un seul token par transaction, il faut pouvoir en envoyer plusieurs en même temps.
