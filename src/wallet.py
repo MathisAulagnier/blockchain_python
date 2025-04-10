@@ -9,7 +9,6 @@ class Wallet:
     
     def deposit_token(self, token_id, stake=False):
         """Ajoute un token dans le wallet.
-           Si stake=True, le token est déposé dans le solde staké.
         """
         if stake:
             self.staked_tokens.add(token_id)
