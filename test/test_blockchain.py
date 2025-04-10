@@ -24,10 +24,10 @@ class TestBlockchain(unittest.TestCase):
         self.assertEqual(genesis.previous_hash, "0")
         self.assertEqual(genesis.transactions, ["Genesis Block"])
 
-    def test_add_transaction_and_block(self):
+    def test_add_action_and_block(self):
         # Ajout d'une transaction
         tx = "Alice envoie 1 token à Bob"
-        self.blockchain.add_transaction(tx)
+        self.blockchain.add_action(tx)
         self.assertEqual(len(self.blockchain.pending_transactions), 1)
         
         # Enregistrement d'un validateur
@@ -55,7 +55,7 @@ class TestBlockchain(unittest.TestCase):
 
     def test_is_chain_valid(self):
         # Ajoute une transaction et un bloc correct
-        self.blockchain.add_transaction("Test Transaction")
+        self.blockchain.add_action("Test Transaction")
         self.blockchain.register_validator("Validator1", 50)
         chosen_validator = self.blockchain.choose_validator()
         self.blockchain.add_block(chosen_validator, "sig")

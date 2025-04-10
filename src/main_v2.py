@@ -2,7 +2,7 @@ from src.blockchain_manager import BlockchainManager
 from src.token_ import Token
 
 if __name__ == "__main__":
-    token_chain = BlockchainManager(difficulty=2)
+    token_chain = BlockchainManager()
     # Création explicite des wallets utilisés pour la simulation
     # On crée par exemple le wallet de Mathis et celui de Lina
     wallet_mathis = token_chain.wallet_manager.create_wallet("wallet_Mathis")

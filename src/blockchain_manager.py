@@ -8,8 +8,8 @@ from src.wallet_manager import WalletManager
 
 
 class BlockchainManager(Blockchain):
-    def __init__(self, difficulty=2):
-        super().__init__(difficulty)
+    def __init__(self):
+        super().__init__()
         self.token_manager = TokenManager(max_tokens=100)
         self.wallet_manager = WalletManager()
         
@@ -21,7 +21,7 @@ class BlockchainManager(Blockchain):
             self.wallet_manager.deposit(owner_address, token.identifier, stake=False)
         token_data = [token.to_dict() for token in tokens]
         # IMPORTANT : On passe une liste contenant la transaction de création
-        self.add_block([{"action": "token_creation", "owner": owner_address, "tokens": token_data}])
+        self.add_action([{"action": "token_creation", "owner": owner_address, "tokens": token_data}])
         return tokens
 
     
@@ -46,7 +46,7 @@ class BlockchainManager(Blockchain):
             "to": to_address,
             "timestamp": time.time()
         }
-        self.add_block([transaction])
+        self.add_action([transaction])
         return transaction
     
     def stake_token(self, token_id, address):
@@ -65,7 +65,7 @@ class BlockchainManager(Blockchain):
             "address": address,
             "timestamp": time.time()
         }
-        self.add_block([transaction])
+        self.add_action([transaction])
         return transaction
     
     def unstake_token(self, token_id, address):
@@ -84,7 +84,7 @@ class BlockchainManager(Blockchain):
             "address": address,
             "timestamp": time.time()
         }
-        self.add_block([transaction])
+        self.add_action([transaction])
         return transaction
 
     def get_token_history(self, token_id):

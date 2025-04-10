@@ -3,7 +3,7 @@ from src.blockchain_manager import BlockchainManager
 
 class TestBlockchainManager(unittest.TestCase):
     def setUp(self):
-        self.blockchain_manager = BlockchainManager(difficulty=1)  # Difficulté réduite pour les tests
+        self.blockchain_manager = BlockchainManager()  # Difficulté réduite pour les tests
         # Créer explicitement les wallets qui seront utilisés durant les tests
         self.blockchain_manager.wallet_manager.create_wallet("wallet_creator")
         self.blockchain_manager.wallet_manager.create_wallet("alice")

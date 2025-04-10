@@ -23,7 +23,7 @@ def main():
 
     # Ajout d'une transaction : Alice envoie 1 token à Bob
     transaction = "Alice envoie 1 token à Bob"
-    blockchain.add_transaction(transaction)
+    blockchain.add_action(transaction)
     print("\nTransaction ajoutée :", transaction)
 
     # Simulation de la création du bloc candidat contenant les transactions en attente

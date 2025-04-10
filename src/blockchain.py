@@ -26,12 +26,55 @@ class Blockchain:
         """
         return self.chain[-1]
 
-    def add_transaction(self, transaction):
+    def add_action(self, transaction, pbft_instance=None):
         """
-        Ajoute une transaction à la liste des transactions en attente.
-        :param transaction: Données de la transaction à ajouter
+        Ajoute une action (transaction) à la liste des actions en attente.
+        Si une instance PBFT est passée et que le nombre d'actions en attente >= 2,
+        le processus de consensus PBFT est lancé automatiquement.
+        :param transaction: Données de la transaction à ajouter.
+        :param pbft_instance: Instance de PBFTConsensus (optionnel) pour lancer le consensus.
         """
         self.pending_transactions.append(transaction)
+        # Déclenche le processus PBFT dès que 2 actions sont en attente et que pbft_instance est fourni.
+        if pbft_instance and len(self.pending_transactions) >= 1:
+            self.try_process_pending_actions(pbft_instance)
+
+    def try_process_pending_actions(self, pbft_instance):
+        """
+        Lance le processus de consensus PBFT si le nombre d'actions en attente atteint
+        ou dépasse 2. Cette méthode crée un bloc candidat à partir des actions en attente,
+        choisit un validateur et déclenche successivement les phases Pre-prepare,
+        Prepare et Commit du consensus PBFT.
+        Si le consensus aboutit, le bloc est ajouté à la chaîne.
+        :param pbft_instance: Instance de PBFTConsensus utilisée pour le processus de consensus.
+        """
+        if len(self.pending_transactions) >= 2:
+            # Sélection d'un validateur (qui jouera le rôle de leader)
+            validator = self.choose_validator()
+            last_block = self.get_last_block()
+            # Création d'un bloc candidat avec l'ensemble des actions en attente
+            candidate_block = Block(
+                index=last_block.index + 1,
+                previous_hash=last_block.hash,
+                transactions=self.pending_transactions,
+                timestamp=time.time()
+            )
+            # Phase Pre-prepare : le leader (ici, le validateur choisi) propose le bloc
+            pre_prepare_msg = pbft_instance.pre_prepare(candidate_block, leader=validator)
+            print(pre_prepare_msg)
+            # Phase Prepare : chaque validateur vote sur le bloc proposé
+            for v in self.validators:
+                vote_msg = pbft_instance.prepare(candidate_block, v, True)
+                print(vote_msg)
+            # Phase Commit : vérification que le bloc recueille suffisamment de votes favorables
+            success, commit_msg = pbft_instance.commit(candidate_block)
+            print(commit_msg)
+            if success:
+                consensus_signature = pbft_instance.get_consensus_signature(candidate_block)
+                # Ajoute le bloc à la chaîne en enregistrant le validateur et la signature PBFT
+                self.add_block(validator, consensus_signature)
+            else:
+                print("Consensus PBFT échoué, le bloc n'est pas ajouté.")
 
     def register_validator(self, validator, stake):
         """
