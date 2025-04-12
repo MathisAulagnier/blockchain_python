@@ -3,7 +3,7 @@ import json
 import time
 
 class Block:
-    def __init__(self, index, previous_hash, transactions, timestamp=None):
+    def __init__(self, index, previous_hash, transactions, timestamp=None, validator=None, pbft_signature=None):
         """
         Initialise un bloc de la blockchain en configurant ses données et en calculant son hash.
         Les attributs validator et pbft_signature sont initialisés à None.
@@ -17,8 +17,8 @@ class Block:
         self.timestamp = timestamp or time.time()
         self.transactions = transactions
         # Initialisation des attributs pour Proof of Stake (PoS) et consensus PBFT
-        self.validator = None
-        self.pbft_signature = None
+        self.validator = validator
+        self.pbft_signature = pbft_signature
         # Calcule immédiatement le hash sans processus de minage
         self.hash = self.calculate_hash()
 
@@ -28,15 +28,15 @@ class Block:
         Les attributs validator et pbft_signature sont inclus pour garantir l'intégrité dans le contexte PoS/PBFT.
         :return: Le hash du bloc sous forme de chaîne hexadécimale.
         """
-        block_data = {
+        block_string = json.dumps({
             "index": self.index,
             "timestamp": self.timestamp,
             "transactions": self.transactions,
             "previous_hash": self.previous_hash,
             "validator": self.validator,
             "pbft_signature": self.pbft_signature
-        }
-        block_string = json.dumps(block_data, sort_keys=True).encode()
+        }, sort_keys=True).encode()
+        
         return hashlib.sha256(block_string).hexdigest()
 
     def print_block(self):

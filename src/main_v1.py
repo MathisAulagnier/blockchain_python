@@ -1,8 +1,8 @@
-from src.blockchain import BlockchainPow
+from src.blockchain_pow import BlockchainPow
 from src.block import BlockPow
 
 # Création de la blockchain
-my_blockchain = Blockchain(difficulty=4)
+my_blockchain = BlockchainPow(difficulty=4)
 print("Blockchain initialisée avec le bloc génésis :")
 
 # Ajout de blocs

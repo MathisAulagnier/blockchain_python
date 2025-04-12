@@ -1,13 +1,12 @@
 from src.block import Block
 import time
+import random
 
 class Blockchain:
     def __init__(self):
 
         self.chain = [self.create_genesis_block()]
-        self.pending_transactions = []  # Transactions en attente d'inclusion dans un bloc
-        self.validators = []            # Liste des identifiants des validateurs
-        self.stakes = {}                # Dictionnaire associant chaque validateur à son montant de stake
+        self.pending_transactions = []
 
     def create_genesis_block(self):
         """
@@ -19,6 +18,21 @@ class Blockchain:
             transactions=["Genesis Block"],
             timestamp=time.time()
         )
+    
+    def create_candidate_block(self, transactions):
+        """
+        Crée un bloc candidat à partir des transactions données.
+        Ce bloc n'est pas encore ajouté à la chaîne, il sert à la validation via le consensus.
+        """
+        last_block = self.get_last_block()
+        candidate = Block(
+            index=last_block.index + 1,
+            previous_hash=last_block.hash,
+            transactions=transactions,
+            timestamp=time.time()
+        )
+        return candidate
+
 
     def get_last_block(self):
         """
@@ -33,32 +47,7 @@ class Blockchain:
         """
         self.pending_transactions.append(transaction)
 
-    def register_validator(self, validator, stake):
-        """
-        Enregistre un validateur en ajoutant le montant de stake indiqué.
-        Si le validateur est déjà enregistré, son stake est incrémenté.
-        :param validator: Identifiant du validateur (exemple, adresse ou nom)
-        :param stake: Montant de stake à ajouter pour ce validateur
-        """
-        if validator not in self.validators:
-            self.validators.append(validator)
-        self.stakes[validator] = self.stakes.get(validator, 0) + stake
 
-    def choose_validator(self):
-        """
-        Sélectionne un validateur de manière pondérée en fonction du stake.
-        Un nombre aléatoire est tiré pour choisir parmi les validateurs en proportion de leur stake.
-        :return: L'identifiant du validateur sélectionné
-        """
-        total_stake = sum(self.stakes.values())
-        import random
-        pick = random.uniform(0, total_stake)
-        current = 0
-        for validator, stake in self.stakes.items():
-            current += stake
-            if current > pick:
-                return validator
-        return None
 
     def add_block(self, validator, pbft_signature):
         """
@@ -73,13 +62,15 @@ class Blockchain:
             index=last_block.index + 1,
             previous_hash=last_block.hash,
             transactions=self.pending_transactions,
-            timestamp=time.time()
+            timestamp=time.time(),
+            validator = validator,
+            pbft_signature = pbft_signature
         )
         # Ajout des attributs spécifiques à PoS et PBFT
-        new_block.validator = validator
-        new_block.pbft_signature = pbft_signature
+        
         self.chain.append(new_block)
         self.pending_transactions = []
+        print(f"Block {new_block.index} ajouté avec succès !")
 
     def is_chain_valid(self):
         """
@@ -93,9 +84,13 @@ class Blockchain:
             current = self.chain[i]
             previous = self.chain[i - 1]
             if current.hash != current.calculate_hash():
+                print(f"Hash mismatch at block {current.index}")
                 return False
+                
             if current.timestamp < previous.timestamp:
+                print(f"Timestamp mismatch at block {current.index}")
                 return False
             if current.previous_hash != previous.hash:
+                print(f"Previous hash mismatch at block {current.index}")
                 return False
         return True

@@ -1,7 +1,8 @@
-class PBFTConsensus:
+class PBFT:
 
-    def __init__(self, validators):
+    def __init__(self, validators, stakes):
         self.validators = validators
+        self.stakes = stakes
         # Dictionnaires pour stocker les messages et votes par index de bloc
         self.pre_prepare_messages = {}  # Exemple : {block_index: {"block": block, "leader": leader}}
         self.prepare_votes = {}         # Exemple : {block_index: {validator: vote}}
@@ -33,19 +34,18 @@ class PBFTConsensus:
 
     def commit(self, block):
         """
-        Phase Commit : Vérifie si le bloc recueille au moins 2/3 des votes favorables.
-        Si oui, le bloc est considéré comme commité.
-        :param block: Bloc en cours de validation
-        :return: Tuple (booléen indiquant le succès, message descriptif)
+        Phase Commit : Vérifie si le bloc recueille au moins 2/3 des votes favorables pondérés par le stake.
+        Pour chaque validateur ayant voté, son vote compte avec un poids correspondant à son stake.
         """
         votes = self.prepare_votes.get(block.index, {})
-        total_votes = len(votes)
-        positive_votes = sum(1 for v in votes.values() if v is True)
-        if total_votes >= len(self.validators) and positive_votes >= (2 * len(self.validators)) / 3:
+        weighted_total = sum(self.stakes.get(v, 0) for v in self.validators if v in votes)
+        weighted_positive = sum(self.stakes.get(v, 0) for v, vote in votes.items() if vote)
+        
+        if weighted_total > 0 and weighted_positive >= (2 * weighted_total) / 3:
             self.commit_votes[block.index] = votes
-            return True, f"Commit: Bloc {block.index} validé avec {positive_votes}/{len(self.validators)} votes favorables."
+            return True, f"Commit: Bloc {block.index} validé avec un poids positif de {weighted_positive}/{weighted_total}."
         else:
-            return False, f"Commit: Bloc {block.index} rejeté avec {positive_votes}/{len(self.validators)} votes favorables."
+            return False, f"Commit: Bloc {block.index} rejeté avec un poids positif de {weighted_positive}/{weighted_total}."
 
     def get_consensus_signature(self, block):
         """

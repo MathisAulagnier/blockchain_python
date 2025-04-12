@@ -8,3 +8,8 @@
 JJ:
 - Faire plutot une fonction create_user_wallet dans le blockchain manager, pour qu'il puisse recharger directement le wallet avec un nombre de token en prenant depuis le wallet creator. Retirer ou alors modifier le init, pour qu'il créer d'office le wallet creator, avec un nombre de token en argument:
     token_chain = BlockchainManager(difficulty=2) et remplacer le difficulty par la le nombre de token a créer dans cette blockchain, ensuite ca créer automatiquement le wallet creator avec ce nombre de token et ainsi quand on crée un wallet, on le recharge automatiquement avec un nombre de token provenant du wallet creator.
+
+
+
+
+- Faire une fonction pour distribuer plusieurs token à la fois (ajouter des vérifications de soldes avant le transfert)
