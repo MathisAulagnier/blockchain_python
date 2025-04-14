@@ -1,0 +1,750 @@
+src/block
+
+import hashlib
+import json
+import time
+
+class Block:
+    def __init__(self, index, previous_hash, transactions, timestamp=None, validator=None, pbft_signature=None):
+        """
+        Initialise un bloc de la blockchain en configurant ses données et en calculant son hash.
+        Les attributs validator et pbft_signature sont initialisés à None.
+        :param index: l'indice du bloc dans la chaîne
+        :param previous_hash: le hash du bloc précédent
+        :param transactions: la liste des transactions à inclure dans le bloc
+        :param timestamp: l'horodatage du bloc, ou le temps actuel si None
+        """
+        self.index = index
+        self.previous_hash = previous_hash
+        self.timestamp = timestamp or time.time()
+        self.transactions = transactions
+        # Initialisation des attributs pour Proof of Stake (PoS) et consensus PBFT
+        self.validator = validator
+        self.pbft_signature = pbft_signature
+        # Calcule immédiatement le hash sans processus de minage
+        self.hash = self.calculate_hash()
+
+    def calculate_hash(self):
+        """
+        Calcule le hash du bloc en utilisant SHA-256 sur un dictionnaire des données du bloc.
+        Les attributs validator et pbft_signature sont inclus pour garantir l'intégrité dans le contexte PoS/PBFT.
+        :return: Le hash du bloc sous forme de chaîne hexadécimale.
+        """
+        block_string = json.dumps({
+            "index": self.index,
+            "timestamp": self.timestamp,
+            "transactions": self.transactions,
+            "previous_hash": self.previous_hash,
+            "validator": self.validator,
+            "pbft_signature": self.pbft_signature
+        }, sort_keys=True).encode()
+        
+        return hashlib.sha256(block_string).hexdigest()
+
+    def print_block(self):
+        """
+        Affiche les informations essentielles du bloc pour le débogage ou la visualisation.
+        """
+        print(f'__Block n° {self.index} __')
+        print(f'Hash précédent : {self.previous_hash[:10]}')
+        print(f'Date : {self.timestamp}')
+        print(f'Nombre de transactions : {len(self.transactions)}')
+        print(f'Transactions : {self.transactions}')
+        print(f'Hash du bloc: {self.hash[:10]}')
+        print(f'Validateur : {self.validator}')
+        print(f'Signature PBFT : {self.pbft_signature}')
+        print('_______________\n')
+
+    def __repr__(self):
+        return f"Block({self.index}, {self.previous_hash}, {self.timestamp}, {self.transactions}, {self.hash})"
+
+
+src/blockchain.py :
+
+from src.block import Block
+import time
+import random
+
+class Blockchain:
+    def __init__(self):
+
+        self.chain = [self.create_genesis_block()]
+        self.pending_transactions = []
+
+    def create_genesis_block(self):
+        """
+        Crée le bloc génésis de la blockchain.
+        """
+        return Block(
+            index=0,
+            previous_hash="0",
+            transactions=["Genesis Block"],
+            timestamp=time.time()
+        )
+    
+    def create_candidate_block(self, transactions):
+        """
+        Crée un bloc candidat à partir des transactions données.
+        Ce bloc n'est pas encore ajouté à la chaîne, il sert à la validation via le consensus.
+        """
+        last_block = self.get_last_block()
+        candidate = Block(
+            index=last_block.index + 1,
+            previous_hash=last_block.hash,
+            transactions=transactions,
+            timestamp=time.time()
+        )
+        return candidate
+
+
+    def get_last_block(self):
+        """
+        Retourne le dernier bloc de la chaîne.
+        """
+        return self.chain[-1]
+
+    def add_transaction(self, transaction):
+        """
+        Ajoute une transaction à la liste des transactions en attente.
+        :param transaction: Données de la transaction à ajouter
+        """
+        self.pending_transactions.append(transaction)
+
+
+
+    def add_block(self, validator, pbft_signature):
+        """
+        Ajoute un nouveau bloc à la chaîne à partir des transactions en attente.
+        Le bloc est validé par le validateur sélectionné et reçoit une signature issue du consensus PBFT.
+        Après ajout, la liste des transactions en attente est vidée.
+        :param validator: Identifiant du validateur ayant validé le bloc
+        :param pbft_signature: Signature générée via le consensus PBFT
+        """
+        last_block = self.get_last_block()
+        new_block = Block(
+            index=last_block.index + 1,
+            previous_hash=last_block.hash,
+            transactions=self.pending_transactions,
+            timestamp=time.time(),
+            validator = validator,
+            pbft_signature = pbft_signature
+        )
+        # Ajout des attributs spécifiques à PoS et PBFT
+        
+        self.chain.append(new_block)
+        self.pending_transactions = []
+        print(f"Block {new_block.index} ajouté avec succès !")
+
+    def is_chain_valid(self):
+        """
+        Vérifie l'intégrité de la blockchain en s'assurant que :
+          - Le hash de chaque bloc correspond bien au recalcul de ses données.
+          - Les timestamps sont cohérents (le bloc courant est créé après le précédent).
+          - Chaque bloc référence correctement le hash du bloc précédent.
+        :return: True si la blockchain est valide, False sinon.
+        """
+        for i in range(1, len(self.chain)):
+            current = self.chain[i]
+            previous = self.chain[i - 1]
+            if current.hash != current.calculate_hash():
+                print(f"Hash mismatch at block {current.index}")
+                return False
+                
+            if current.timestamp < previous.timestamp:
+                print(f"Timestamp mismatch at block {current.index}")
+                return False
+            if current.previous_hash != previous.hash:
+                print(f"Previous hash mismatch at block {current.index}")
+                return False
+        return True
+
+src/token_.py :
+
+###################
+#### ATTENTION ####
+# NE RENOMMEZ PAS #
+## CE FICHIER !  ##
+###################
+
+# Le fichier indexation utilise la librairie yfinance 
+# Qui utilise la librairie token! Danger -> from token import *
+
+
+import uuid
+import json
+import hashlib
+from datetime import datetime
+from src.indexation import get_value, plot_value_index
+
+
+
+class Token:
+    def __init__(self):
+        self.identifier = str(uuid.uuid4())
+        self.created_at = datetime.now().timestamp()
+        self.hash = self.calculate_hash()
+        
+    def calculate_hash(self):
+        """Calcule un hash unique pour ce token basé sur ses attributs"""
+        token_string = json.dumps({
+            "identifier": self.identifier,
+            "created_at": self.created_at
+        }, sort_keys=True).encode()
+        return hashlib.sha256(token_string).hexdigest()
+    
+    def get_value(self):
+        """Récupère la valeur actuelle du token"""
+        return get_value()
+    
+    def plot_value(nb_days=30):
+        """Affiche la valeur du token sur un graphique"""
+        # Implémentation de la fonction d'affichage
+        plot_value_index(nb_days)
+        # Demander si vous souhaiter récupérer les dataframes des devises
+        return None
+        
+        
+    def to_dict(self):
+        """Convertit le token en dictionnaire"""
+        return {
+            "identifier": self.identifier,
+            "created_at": self.created_at,
+            "hash": self.hash
+        }
+    
+    def __repr__(self):
+        return f"Token(id={self.identifier[:8]}..., )"
+
+src/token_manager.py:
+
+import time
+from src.token_ import Token
+
+class TokenManager:
+    def __init__(self, max_tokens=100):
+        self.tokens = {}
+        self.max_tokens = max_tokens
+        
+    def create_token(self):
+        """Crée un nouveau token s'il reste des places disponibles"""
+        if len(self.tokens) >= self.max_tokens:
+            raise ValueError(f"Nombre maximum de tokens atteint ({self.max_tokens})")
+        
+        token = Token()
+        self.tokens[token.identifier] = token
+        return token
+    
+    def create_initial_tokens(self, count=100):
+        """Crée le nombre défini de tokens initiaux"""
+        created_tokens = []
+        for _ in range(min(count, self.max_tokens - len(self.tokens))):
+            token = self.create_token()
+            created_tokens.append(token)
+        return created_tokens
+    
+    def get_token(self, token_id):
+        """Récupère un token par son identifiant"""
+        return self.tokens.get(token_id)
+    
+    def get_all_tokens(self):
+        return list(self.tokens.values())
+    
+    # N'existe pas car les la gestion des tokens en staking est gérée par le wallet
+    # def get_staking_tokens(self): 
+       # return [token for token in self.tokens.values() if token.staking]
+    
+    def get_tokens_value(self):
+        """Calcule la valeur totale de tous les tokens"""
+        if not self.tokens:
+            return 0
+            
+        # Tous les tokens ont la même valeur dans votre implémentation
+        # On prend donc la valeur d'un seul token et on multiplie par le nombre
+        single_value = next(iter(self.tokens.values())).get_value()
+        return single_value * len(self.tokens)
+    
+
+src/wallet.py : 
+# wallet.py
+import uuid
+
+class Wallet:
+    def __init__(self, address=None):
+        self.address = address or str(uuid.uuid4()) # Si une adresse est fournie, on l'utilise, sinon on en génère une unique.
+        self.available_tokens = set()
+        self.staked_tokens = set()
+    
+    def deposit_token(self, token_id, stake=False):
+        """Ajoute un token dans le wallet.
+        """
+        if stake:
+            self.staked_tokens.add(token_id)
+        else:
+            self.available_tokens.add(token_id)
+    
+    def withdraw_token(self, token_id):
+        """Retire un token du solde disponible (pour un transfert par exemple)."""
+        if token_id in self.available_tokens:
+            self.available_tokens.remove(token_id)
+            return True
+        return False
+
+    def stake_token(self, token_id):
+        """Déplace un token du solde disponible vers le solde staké."""
+        if token_id in self.available_tokens:
+            self.available_tokens.remove(token_id)
+            self.staked_tokens.add(token_id)
+            return True
+        return False
+
+    def unstake_token(self, token_id):
+        """Déplace un token du solde staké vers le solde disponible."""
+        if token_id in self.staked_tokens:
+            self.staked_tokens.remove(token_id)
+            self.available_tokens.add(token_id)
+            return True
+        return False
+
+    def balance(self):
+        return len(self.available_tokens)
+
+    def staked_balance(self):
+        return len(self.staked_tokens)
+
+    def total_balance(self):
+        return self.balance() + self.staked_balance()
+
+    def __repr__(self):
+        return f"Wallet({self.address}, available: {self.balance()}, staked: {self.staked_balance()})"
+
+src/wallet_manager.py :
+
+# wallet_manager.py
+from src.wallet import Wallet
+
+class WalletManager:
+    def __init__(self):
+        self.wallets = {}
+    
+    def create_wallet(self, address=None):
+        wallet = Wallet(address)
+        self.wallets[wallet.address] = wallet
+        return wallet
+    
+    def get_wallet(self, address):
+        if address in self.wallets:
+            return self.wallets[address]
+        raise ValueError(f"Le wallet '{address}' n'existe pas.")
+    
+    def deposit(self, address, token_id, stake=False):
+        wallet = self.get_wallet(address)
+        wallet.deposit_token(token_id, stake)
+        return wallet
+
+src/pbft.py : 
+class PBFT:
+
+    def __init__(self, validators, stakes):
+        self.validators = validators
+        self.stakes = stakes
+        # Dictionnaires pour stocker les messages et votes par index de bloc
+        self.pre_prepare_messages = {}  # Exemple : {block_index: {"block": block, "leader": leader}}
+        self.prepare_votes = {}         # Exemple : {block_index: {validator: vote}}
+        self.commit_votes = {}          # Exemple : {block_index: {validator: vote}}
+
+    def pre_prepare(self, block, leader):
+        """
+        Phase Pre-prepare : le leader propose un bloc.
+        Enregistre le message de pré-proposition.
+        :param block: Bloc proposé
+        :param leader: Identifiant du leader
+        :return: Message de pré-proposition
+        """
+        self.pre_prepare_messages[block.index] = {"block": block, "leader": leader}
+        return f"Pre-prepare: Bloc {block.index} proposé par le leader {leader}"
+
+    def prepare(self, block, validator, vote):
+        """
+        Phase Prepare : chaque nœud valide localement le bloc et vote.
+        :param block: Bloc sur lequel voter
+        :param validator: Identifiant du validateur qui vote
+        :param vote: Vote exprimé (True pour approuver, False pour rejeter)
+        :return: Message de vote en phase prepare
+        """
+        if block.index not in self.prepare_votes:
+            self.prepare_votes[block.index] = {}
+        self.prepare_votes[block.index][validator] = vote
+        return f"Prepare: Validator {validator} a voté {vote} pour le Bloc {block.index}"
+
+    def commit(self, block):
+        """
+        Phase Commit : Vérifie si le bloc recueille au moins 2/3 des votes favorables pondérés par le stake.
+        Pour chaque validateur ayant voté, son vote compte avec un poids correspondant à son stake.
+        """
+        votes = self.prepare_votes.get(block.index, {})
+        weighted_total = sum(self.stakes.get(v, 0) for v in self.validators if v in votes)
+        weighted_positive = sum(self.stakes.get(v, 0) for v, vote in votes.items() if vote)
+        
+        if weighted_total > 0 and weighted_positive >= (2 * weighted_total) / 3:
+            self.commit_votes[block.index] = votes
+            return True, f"Commit: Bloc {block.index} validé avec un poids positif de {weighted_positive}/{weighted_total}."
+        else:
+            return False, f"Commit: Bloc {block.index} rejeté avec un poids positif de {weighted_positive}/{weighted_total}."
+
+    def get_consensus_signature(self, block):
+        """
+        Simule la génération d'une signature de consensus PBFT pour le bloc.
+        :param block: Bloc validé
+        :return: Chaîne représentant la signature (pour simplification)
+        """
+        return f"PBFT_Signature_Block_{block.index}"
+
+src/blockchain_manager.py :
+
+import time
+from src.blockchain import Blockchain
+from src.token_manager import TokenManager
+from src.wallet_manager import WalletManager
+from src.pbft import PBFT  
+import random
+
+class BlockchainManager(Blockchain):
+    def __init__(self, initial_supply=100, origin_wallet="wallet_creator", transaction_threshold=2):
+        super().__init__()
+        self.token_manager = TokenManager(max_tokens=100)
+        self.wallet_manager = WalletManager() 
+        self.validators = []             # Liste des validateurs
+        self.manual_votes = {}           # Dictionnaire pour les votes manuels des validateurs
+        self.stakes = {}                 # Dictionnaire associant validateur et montant staké
+        self.pbft = PBFT(self.validators, self.stakes) 
+        self.transaction_threshold = transaction_threshold  # Seuil d'automatisme de commit
+        self.origin_wallet = origin_wallet
+
+        # Création (ou récupération) du wallet d'origine
+        try:
+            self.wallet_manager.get_wallet(self.origin_wallet)
+        except ValueError:
+            self.wallet_manager.create_wallet(self.origin_wallet)
+        # Création de l'offre initiale et commit immédiat des transactions de création si token n'est pas à 0
+        if initial_supply > 0:
+            self.create_initial_supply(count=initial_supply + 3 , origin_wallet=self.origin_wallet)
+        
+    def add_transaction(self, transaction):
+        """
+        Ajoute une transaction (ou une liste de transactions) à la file d'attente.
+        et déclenche la validation dès que le seuil est atteint.
+        """
+        if isinstance(transaction, list):
+            self.pending_transactions.extend(transaction)
+        else:
+            self.pending_transactions.append(transaction)
+        
+        # Vérifier si le nombre de transactions atteint le seuil pour commiter
+        if len(self.pending_transactions) >= self.transaction_threshold:
+            self.commit_pending_transactions()
+            
+    def commit_pending_transactions(self):
+        """
+        Exécute le processus de consensus PBFT pour valider et ajouter le bloc contenant les transactions en attente.
+        Avant de lancer le consensus, affiche pour chaque transaction son type (création, transfert, stake, unstake, etc.).
+        """
+        if not self.pending_transactions:
+            print("Aucune transaction à commiter.")
+            return
+
+        print("\n⛓️ Lancement du consensus PBFT...")
+
+        # Création du bloc candidat en utilisant la méthode dédiée de la classe Blockchain
+        candidate_block = self.create_candidate_block(self.pending_transactions.copy())
+
+        # Affichage des transactions du bloc candidat avec leur type
+        print("Transactions dans le bloc candidat :")
+        for tx in candidate_block.transactions:
+            # On suppose que chaque transaction est un dictionnaire avec une clé "action"
+            action = tx.get("action", "inconnue")
+            if action == "token_creation":
+                print("  - Création de tokens pour wallet:", tx.get("owner"))
+            elif action == "transfer":
+                print("  - Transfert de token {} de {} vers {}".format(tx.get("token_id"), tx.get("from"), tx.get("to")))
+            elif action == "stake":
+                print("  - Staking du token {} pour {}".format(tx.get("token_id"), tx.get("address")))
+            elif action == "unstake":
+                print("  - Unstaking du token {} pour {}".format(tx.get("token_id"), tx.get("address")))
+            else:
+                print("  - Transaction de type {}: {}".format(action, tx))
+
+        # Sélection du leader grâce au mécanisme PoS
+        leader = self.choose_validator()
+        print("🧑‍⚖️ Validateur choisi (leader) :", leader)
+
+        # Phase de pre-prepare : appel de la méthode du protocole PBFT
+        self.pbft.pre_prepare(candidate_block, leader)
+
+        # Phase de prepare : chaque validateur vote sur le bloc candidat
+        for validator in self.validators:
+            vote = self.decide_vote(validator, candidate_block)
+            print(f"🗳️ {validator} vote {'✅' if vote else '❌'}")
+            self.pbft.prepare(candidate_block, validator, vote)
+
+        # Phase de commit : obtenir le résultat du consensus
+        success, message = self.pbft.commit(candidate_block)
+        print(message)
+
+        if success:
+            signature = self.pbft.get_consensus_signature(candidate_block)
+            self.add_block(leader, signature)
+            print(f"✅ Bloc {candidate_block.index} ajouté !\n")
+            #Print hash 
+            print(f"Hash du bloc {candidate_block.index} : {candidate_block.hash}\n")
+        else:
+            print("❌ Consensus échoué, bloc rejeté.\n")
+
+
+    def decide_vote(self, validator, block):
+        """
+        Retourne le vote défini manuellement pour le validateur.
+        Si aucun vote n'est défini, retourne True par défaut.
+        """
+        return self.manual_votes.get(validator, True)
+
+    
+    def create_initial_supply(self, count=100, origin_wallet="wallet_creator"):
+        """
+        Crée l'offre initiale de tokens et les attribue au wallet d'origine.
+        La transaction de création est ajoutée aux transactions en attente
+        puis committée immédiatement dans un bloc unique.
+        
+        Ce bloc unique inclut :
+        - La création initiale des tokens,
+        - Le transfert des tokens vers les wallets de base (wallet_Lina, wallet_Mathis, wallet_JJ),
+        - Le staking (1 token) de chacun de ces wallets pour qu'ils deviennent validateurs.
+        """
+        # Pour s'assurer que toutes les transactions sont regroupées dans un seul bloc,
+        # on désactive temporairement le déclenchement automatique du commit.
+        original_threshold = self.transaction_threshold
+        self.transaction_threshold = 10**9  # Valeur très élevée pour éviter les commits intermédiaires
+
+        # --- Création des tokens initiaux ---
+        tokens = self.token_manager.create_initial_tokens(count)
+        try:
+            owner_wallet = self.wallet_manager.get_wallet(origin_wallet)
+        except ValueError:
+            owner_wallet = self.wallet_manager.create_wallet(origin_wallet)
+        for token in tokens:
+            owner_wallet.deposit_token(token.identifier, stake=False)
+        token_data = [token.to_dict() for token in tokens]
+        # Ajout de la transaction de création des tokens
+        self.pending_transactions.append({
+            "action": "token_creation",
+            "owner": origin_wallet,
+            "tokens": token_data
+        })
+        
+        # --- Création et staking des wallets initiaux ---
+        # On crée et crédite trois wallets de base, puis on stake 1 token pour chacun.
+        self.create_and_stake_initial_wallet("wallet_Lina", initial_credit=1, stake_count=1)
+        self.create_and_stake_initial_wallet("wallet_Mathis", initial_credit=1, stake_count=1)
+        self.create_and_stake_initial_wallet("wallet_JJ", initial_credit=1, stake_count=1)
+        
+        self.add_block(origin_wallet, "INITIAL_SUPPLY")
+        # On vide la file des transactions en attente
+        self.pending_transactions = []
+        
+        # Restauration du seuil de commit d'origine
+        self.transaction_threshold = original_threshold
+        
+        return tokens
+
+    def transfer_token(self, token_id, from_address, to_address):
+        """
+        Transfère un token d'un wallet à un autre et ajoute la transaction en file.
+        Le transfert n'est pas immédiatement validé par la création d'un bloc.
+        """
+        from_wallet = self.wallet_manager.get_wallet(from_address)
+        to_wallet = self.wallet_manager.get_wallet(to_address)
+        if token_id not in from_wallet.available_tokens:
+            raise ValueError(f"Token {token_id} n'est pas disponible dans le wallet {from_address} (peut être en staking)")
+        from_wallet.withdraw_token(token_id)
+        to_wallet.deposit_token(token_id, stake=False)
+        transaction = {
+            "action": "transfer",
+            "token_id": token_id,
+            "from": from_address,
+            "to": to_address,
+            "timestamp": time.time()
+        }
+        self.add_transaction(transaction)
+        return transaction
+
+    def stake_token(self, token_id, address):
+        """
+        Déplace un token du solde disponible vers le solde staké dans le wallet spécifié,
+        et ajoute la transaction en file.
+        """
+        wallet = self.wallet_manager.get_wallet(address)
+        if token_id not in wallet.available_tokens:
+            raise ValueError(f"Token {token_id} n'est pas disponible dans le wallet {address} pour être staké")
+        wallet.stake_token(token_id)
+        transaction = {
+            "action": "stake",
+            "token_id": token_id,
+            "address": address,
+            "timestamp": time.time()
+        }
+        self.add_transaction(transaction)
+        self.register_validator(address, stake=1)
+        return transaction
+
+    def unstake_token(self, token_id, address):
+        """
+        Déplace un token du solde staké vers le solde disponible du wallet spécifié,
+        et ajoute la transaction en file.
+        """
+        wallet = self.wallet_manager.get_wallet(address)
+        if token_id not in wallet.staked_tokens:
+            raise ValueError(f"Token {token_id} n'est pas en staking dans le wallet {address}")
+        wallet.unstake_token(token_id)
+        transaction = {
+            "action": "unstake",
+            "token_id": token_id,
+            "address": address,
+            "timestamp": time.time()
+        }
+        self.add_transaction(transaction)
+        return transaction
+
+    def get_token_history(self, token_id):
+        """Retourne l'historique des transactions pour un token spécifique."""
+        token_transactions = []
+        for block in self.chain:
+            for transaction in block.transactions:
+                # Si la transaction individuelle concerne ce token
+                if isinstance(transaction, dict) and transaction.get("token_id") == token_id:
+                    t = transaction.copy()
+                    t["block_hash"] = block.hash
+                    t["block_index"] = block.index
+                    token_transactions.append(t)
+                # Pour une transaction groupée de création
+                elif (isinstance(transaction, dict) and 
+                      transaction.get("action") == "token_creation" and 
+                      "tokens" in transaction):
+                    for token_data in transaction["tokens"]:
+                        if token_data.get("identifier") == token_id:
+                            creation_info = {
+                                "action": "creation",
+                                "token_id": token_id,
+                                "timestamp": block.timestamp,
+                                "block_hash": block.hash,
+                                "block_index": block.index
+                            }
+                            token_transactions.append(creation_info)
+        return token_transactions
+
+    def get_token_by_index(self, index):
+        """Récupère un token par son index dans la liste des tokens."""
+        all_tokens = self.token_manager.get_all_tokens()
+        if 0 <= index < len(all_tokens):
+            return all_tokens[index]
+        return None
+
+    def get_staking_stats(self):
+        all_tokens = self.token_manager.get_all_tokens()
+        total_tokens = len(all_tokens)
+        total_staked = sum(len(wallet.staked_tokens) for wallet in self.wallet_manager.wallets.values())
+        staking_percentage = (total_staked / total_tokens * 100) if total_tokens > 0 else 0
+        total_value = self.token_manager.get_tokens_value()
+        single_value = total_value / total_tokens if total_tokens > 0 else 0
+        return {
+            "total_tokens": total_tokens,
+            "staking_tokens": total_staked,
+            "staking_percentage": staking_percentage,
+            "total_value": total_value,
+            "staking_value": single_value * total_staked
+        }
+
+    def create_wallet_for_user(self, user_address, initial_credit=5):
+        """
+        Crée un nouveau wallet pour un utilisateur et le crédite automatiquement avec un nombre fixe de tokens
+        provenant du wallet d'origine.
+        """
+        new_wallet = self.wallet_manager.create_wallet(user_address)
+        origin = self.origin_wallet
+        origin_wallet = self.wallet_manager.get_wallet(origin)
+        available_tokens = list(origin_wallet.available_tokens)
+        if len(available_tokens) < initial_credit:
+            raise ValueError("Tokens insuffisants dans le wallet d'origine pour créditer le nouveau wallet")
+        for token_id in available_tokens[:initial_credit]:
+            self.transfer_token(token_id, origin, user_address)
+        return new_wallet
+    
+    def create_initial_wallet(self, user_address, initial_credit=5):
+        """
+        Crée un nouveau wallet pour un utilisateur et le crédite automatiquement avec un nombre fixe de tokens
+        provenant du wallet d'origine.
+        Cette fonction est destinée à être utilisée lors de l'initialisation de la blockchain
+        et ajoute les transferts dans pending_transactions sans déclencher de commit.
+        """
+        new_wallet = self.wallet_manager.create_wallet(user_address)
+        origin = self.origin_wallet
+        origin_wallet = self.wallet_manager.get_wallet(origin)
+        available_tokens = list(origin_wallet.available_tokens)
+        if len(available_tokens) < initial_credit:
+            raise ValueError("Tokens insuffisants dans le wallet d'origine pour créditer " + user_address)
+        for token_id in available_tokens[:initial_credit]:
+            origin_wallet.withdraw_token(token_id)
+            new_wallet.deposit_token(token_id, stake=False)
+            transaction = {
+                "action": "transfer",
+                "token_id": token_id,
+                "from": origin,
+                "to": user_address,
+                "timestamp": time.time()
+            }
+            self.pending_transactions.append(transaction)
+        return new_wallet
+
+    
+    def create_and_stake_initial_wallet(self, user_address, initial_credit, stake_count=1):
+        """
+        Crée un nouveau wallet pour un utilisateur (via create_initial_wallet) et le crédite 
+        avec un nombre fixe de tokens provenant du wallet d'origine. Ensuite, pour simuler
+        que ce wallet devient validateur, il stake 'stake_count' tokens (c'est-à-dire retire
+        le ou les tokens du solde disponible et les place dans le solde staké via stake_token).
+        
+        La transaction de transfert est ajoutée à pending_transactions et sera incluse dans le bloc initial.
+        """
+        # Crée le wallet et effectue les transferts directs (sans commit)
+        wallet = self.create_initial_wallet(user_address, initial_credit)
+        # Pour chaque token à staker (au nombre de stake_count), on effectue le staking
+        for _ in range(stake_count):
+            available = list(wallet.available_tokens)
+            if not available:
+                break
+            token_id = available[0]  # On choisit le premier token disponible
+            # Utilise la méthode stake_token qui ajoute une transaction "stake" et inscrit le validateur
+            self.stake_token(token_id, user_address)
+        return wallet
+
+
+    def register_validator(self, validator, stake):
+        """
+        Enregistre un validateur et met à jour son stake.
+        """
+        if validator not in self.validators:
+            self.validators.append(validator)
+        self.stakes[validator] = self.stakes.get(validator, 0) + stake
+
+    def choose_validator(self):
+        """
+        Sélectionne un validateur de manière pondérée en fonction du stake.
+        Un nombre aléatoire est tiré pour choisir parmi les validateurs en proportion de leur stake.
+        :return: L'identifiant du validateur sélectionné
+        """
+        total_stake = sum(self.stakes.values())
+        pick = random.uniform(0, total_stake)
+        current = 0
+        for validator, stake in self.stakes.items():
+            current += stake
+            if current > pick:
+                return validator
+        return None   
