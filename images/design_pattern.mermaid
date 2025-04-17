@@ -13,7 +13,7 @@ classDiagram
         +print_block() void
         +__repr__() string
     }
-    
+
     class Blockchain {
         +int difficulty
         +list chain
@@ -23,7 +23,7 @@ classDiagram
         +add_block(transactions) void
         +is_chain_valid() boolean
     }
-    
+
     class Token {
         +string identifier
         +boolean staking
@@ -37,7 +37,7 @@ classDiagram
         +to_dict() dict
         +__repr__() string
     }
-    
+
     class TokenManager {
         +dict tokens
         +int max_tokens
@@ -50,19 +50,55 @@ classDiagram
         +get_tokens_value() float
         +get_staking_tokens_value() float
     }
-    
-    class TokenBlockchain {
+
+    class Wallet {
+        +string address
+        +set available_tokens
+        +set staked_tokens
+        +__init__(address)
+        +deposit_token(token_id, stake) void
+        +withdraw_token(token_id) boolean
+        +stake_token(token_id) boolean
+        +unstake_token(token_id) boolean
+        +balance() int
+        +staked_balance() int
+        +total_balance() int
+        +__repr__() string
+    }
+
+    class WalletManager {
+        +dict wallets
+        +__init__()
+        +create_wallet(address) Wallet
+        +get_wallet(address) Wallet
+        +deposit(address, token_id, stake) Wallet
+    }
+
+    class BlockchainManager {
         +TokenManager token_manager
-        +__init__(difficulty)
-        +create_initial_supply(count) list
+        +WalletManager wallet_manager
+        +list pending_transactions
+        +string origin_wallet
+        +int transaction_threshold
+        +__init__(difficulty, initial_supply, origin_wallet, transaction_threshold)
+        +add_transaction(transaction) void
+        +commit_pending_transactions() void
+        +create_initial_supply(count, origin_wallet) list
         +transfer_token(token_id, from_address, to_address) dict
         +stake_token(token_id, address) dict
+        +unstake_token(token_id, address) dict
         +get_token_history(token_id) list
         +get_token_by_index(index) Token
         +get_staking_stats() dict
+        +create_wallet_for_user(user_address, initial_credit) Wallet
+        +display_all_blocks() void
+        +display_last_block() void
+        +get_block_count() int
     }
-    
-    Blockchain <|-- TokenBlockchain : extends
-    TokenBlockchain o-- TokenManager : contains
+
+    Blockchain <|-- BlockchainManager : extends
+    BlockchainManager o-- TokenManager : contains
+    BlockchainManager o-- WalletManager : contains
     TokenManager o-- Token : manages
+    WalletManager o-- Wallet : manages
     Blockchain o-- Block : contains
