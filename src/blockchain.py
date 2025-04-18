@@ -7,6 +7,7 @@ class Blockchain:
 
         self.chain = [self.create_genesis_block()]
         self.pending_transactions = []
+        self.pending_rollbacks = []  # liste des fonctions à appeler pour undo
 
     def create_genesis_block(self):
         """
@@ -70,6 +71,7 @@ class Blockchain:
         
         self.chain.append(new_block)
         self.pending_transactions = []
+        self.pending_rollbacks = []
         print(f"Block {new_block.index} ajouté avec succès !")
 
     def is_chain_valid(self):

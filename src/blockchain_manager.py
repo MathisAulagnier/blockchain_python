@@ -16,6 +16,7 @@ class BlockchainManager(Blockchain):
         self.pbft = PBFT(self.validators, self.stakes) 
         self.transaction_threshold = transaction_threshold  # Seuil d'automatisme de commit
         self.origin_wallet = origin_wallet
+        
 
         # Création (ou récupération) du wallet d'origine
         try:
@@ -93,8 +94,16 @@ class BlockchainManager(Blockchain):
             print(f"✅ Bloc {candidate_block.index} ajouté !\n")
             #Print hash 
             print(f"Hash du bloc {candidate_block.index} : {candidate_block.hash}\n")
+
         else:
-            print("❌ Consensus échoué, bloc rejeté.\n")
+            print("❌ Consensus échoué, annulation des TX...\n")
+            for undo in reversed(self.pending_rollbacks):
+                try:
+                    undo()
+                except Exception as e:
+                    print(f"[ROLLBACK ERREUR] {e}")
+            self.pending_transactions.clear()
+            self.pending_rollbacks.clear()
 
 
     def decide_vote(self, validator, block):
@@ -146,6 +155,7 @@ class BlockchainManager(Blockchain):
         self.add_block(origin_wallet, "INITIAL_SUPPLY")
         # On vide la file des transactions en attente
         self.pending_transactions = []
+        self.pending_rollbacks = []
         
         # Restauration du seuil de commit d'origine
         self.transaction_threshold = original_threshold
@@ -157,21 +167,28 @@ class BlockchainManager(Blockchain):
         Transfère un token d'un wallet à un autre et ajoute la transaction en file.
         Le transfert n'est pas immédiatement validé par la création d'un bloc.
         """
-        from_wallet = self.wallet_manager.get_wallet(from_address)
-        to_wallet = self.wallet_manager.get_wallet(to_address)
-        if token_id not in from_wallet.available_tokens:
-            raise ValueError(f"Token {token_id} n'est pas disponible dans le wallet {from_address} (peut être en staking)")
-        from_wallet.withdraw_token(token_id)
-        to_wallet.deposit_token(token_id, stake=False)
-        transaction = {
+        from_w = self.wallet_manager.get_wallet(from_address)
+        to_w   = self.wallet_manager.get_wallet(to_address)
+        if token_id not in from_w.available_tokens:
+            raise ValueError("Token non dispo")
+        from_w.withdraw_token(token_id)
+        to_w.deposit_token(token_id, stake=False)
+        # rollback
+        def undo():
+            w_to = self.wallet_manager.get_wallet(to_address)
+            w_from = self.wallet_manager.get_wallet(from_address)
+            w_to.withdraw_token(token_id)
+            w_from.deposit_token(token_id, stake=False)
+        self.pending_rollbacks.append(undo)
+        tx = {
             "action": "transfer",
             "token_id": token_id,
             "from": from_address,
             "to": to_address,
             "timestamp": time.time()
         }
-        self.add_transaction(transaction)
-        return transaction
+        self.add_transaction(tx)
+        return tx
 
     def stake_token(self, token_id, address):
         """
@@ -182,6 +199,9 @@ class BlockchainManager(Blockchain):
         if token_id not in wallet.available_tokens:
             raise ValueError(f"Token {token_id} n'est pas disponible dans le wallet {address} pour être staké")
         wallet.stake_token(token_id)
+        def undo():
+            self.wallet_manager.get_wallet(address).unstake_token(token_id)
+        self.pending_rollbacks.append(undo)
         transaction = {
             "action": "stake",
             "token_id": token_id,
@@ -201,6 +221,9 @@ class BlockchainManager(Blockchain):
         if token_id not in wallet.staked_tokens:
             raise ValueError(f"Token {token_id} n'est pas en staking dans le wallet {address}")
         wallet.unstake_token(token_id)
+        def undo():
+            self.wallet_manager.get_wallet(address).stake_token(token_id)
+        self.pending_rollbacks.append(undo)
         transaction = {
             "action": "unstake",
             "token_id": token_id,
