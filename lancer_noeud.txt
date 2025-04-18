@@ -1,1 +1,11 @@
 python node_terminal.py --id NOM_WALLET --port NB_PORT --peers 127.0.0.1:PORTSRC,127.0.1:PORTSRC2,....
+
+Ouvrir 3 terminaux et activer le venv dans chaque terminal
+Termial 1:
+python node_terminal.py --id node1 --port 5001 --peers 127.0.0.1:5002,127.0.0.1:5003
+Terminal 2:
+python node_terminal.py --id node2 --port 5002 --peers 127.0.0.1:5001,127.0.0.1:5003
+Terminal 3:
+python node_terminal.py --id node3 --port 5003 --peers 127.0.0.1:5001,127.0.0.1:5002
+
+
