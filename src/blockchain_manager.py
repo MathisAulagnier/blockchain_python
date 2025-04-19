@@ -8,7 +8,7 @@ import random
 class BlockchainManager(Blockchain):
     def __init__(self, initial_supply=100, origin_wallet="wallet_creator", transaction_threshold=2):
         super().__init__()
-        self.token_manager = TokenManager(max_tokens=100)
+        self.token_manager = TokenManager(max_tokens=initial_supply)  # Gestionnaire de tokens
         self.wallet_manager = WalletManager() 
         self.validators = []             # Liste des validateurs
         self.manual_votes = {}           # Dictionnaire pour les votes manuels des validateurs
@@ -114,7 +114,7 @@ class BlockchainManager(Blockchain):
         return self.manual_votes.get(validator, True)
 
     
-    def create_initial_supply(self, count=100, origin_wallet="wallet_creator"):
+    def create_initial_supply(self, count=248, origin_wallet="wallet_creator"):
         """
         Crée l'offre initiale de tokens et les attribue au wallet d'origine.
         La transaction de création est ajoutée aux transactions en attente
@@ -148,9 +148,9 @@ class BlockchainManager(Blockchain):
         
         # --- Création et staking des wallets initiaux ---
         # On crée et crédite trois wallets de base, puis on stake 1 token pour chacun.
-        self.create_and_stake_initial_wallet("wallet_Lina", initial_credit=1, stake_count=1)
-        self.create_and_stake_initial_wallet("wallet_Mathis", initial_credit=1, stake_count=1)
-        self.create_and_stake_initial_wallet("wallet_JJ", initial_credit=1, stake_count=1)
+        self.create_and_stake_initial_wallet("wallet_Lina", initial_credit=15, stake_count=1)
+        self.create_and_stake_initial_wallet("wallet_Mathis", initial_credit=15, stake_count=1)
+        self.create_and_stake_initial_wallet("wallet_JJ", initial_credit=15, stake_count=1)
         
         self.add_block(origin_wallet, "INITIAL_SUPPLY")
         # On vide la file des transactions en attente

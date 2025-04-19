@@ -1,5 +1,6 @@
 from src.blockchain_manager import BlockchainManager
 import random
+from src.token_ import Token
 
 def display_menu():
     print("\n--- MENU PRINCIPAL ---")
@@ -76,7 +77,9 @@ def blockchain_menu(bc_manager):
         print("3. Afficher un bloc par index")
         print("4. Afficher le dernier bloc")
         print("5. Afficher les transactions en attente")
-        print("6. Retour au menu principal")
+        print("6. Afficher le graphique de valeur")
+        print("7. Retour au menu principal")
+        
         choice = input("Choix: ").strip()
         if choice == '1':
             display_status(bc_manager)
@@ -89,6 +92,9 @@ def blockchain_menu(bc_manager):
         elif choice == '5':
             display_pending_transactions(bc_manager)
         elif choice == '6':
+            print("\nAffichage du graphique de valeur:")
+            Token.plot_value(nb_days=60)
+        elif choice == '7':
             break
         else:
             print("Choix invalide, réessayez.")
@@ -316,7 +322,7 @@ def simulate_fake_traffic(bc_manager):
             print(f"  - {action} : token {tid} de {frm} vers {to}")
 
 def main():
-    bc_manager = BlockchainManager(initial_supply=100, origin_wallet="wallet_creator")
+    bc_manager = BlockchainManager(initial_supply=250, origin_wallet="wallet_creator")
     print("Blockchain initialisée.")
     while True:
         display_menu()
@@ -341,12 +347,24 @@ def main():
             if addr: transferer_tokens(bc_manager, addr)
         elif choice == '6':
             new_addr = input("Nouvel wallet (vide pour annuler): ").strip()
-            if new_addr:
-                try:
-                    bc_manager.create_wallet_for_user(new_addr)
-                    print(f"Wallet {new_addr} créé.")
-                except Exception as e:
-                    print(f"[ERREUR] {e}")
+            if not new_addr:
+                continue  # Annulation, retour au menu principal
+
+            # Saisie du montant de tokens initiaux
+            amount_str = input("Nombre de tokens initiaux à créditer (défaut 5) : ").strip()
+            try:
+                initial_credit = int(amount_str) if amount_str else 5
+            except ValueError:
+                print("Entrée invalide, utilisation de 5 tokens par défaut.")
+                initial_credit = 5
+
+            # Création du wallet
+            try:
+                bc_manager.create_wallet_for_user(new_addr, initial_credit=initial_credit)
+                print(f"Wallet '{new_addr}' créé avec {initial_credit} token(s).")
+            except Exception as e:
+                print(f"[ERREUR] {e}")
+
         elif choice == '7':
             load_scenario(bc_manager)
         elif choice == '8':
